@@ -1,0 +1,62 @@
+import sys
+import argparse
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
+from rich.syntax import Syntax
+from rich.progress import Progress, SpinnerColumn, TextColumn
+from ai_sre.agent import SREAgent
+
+console = Console()
+
+def run_interactive_cli(query: str):
+    console.print(Panel(Text("AI-SRE Autonomous Linux Troubleshooting Agent", style="bold green", justify="center"), subtitle="v1.0.0"))
+    
+    if not query:
+        console.print("[bold yellow]Please enter your system warning or issue query:[/bold yellow]")
+        query = input("SRE > ")
+        
+    if not query.strip():
+        console.print("[bold red]Empty query. Exiting diagnostics daemon.[/bold red]")
+        return
+
+    agent = SREAgent(mode="mock")
+    
+    console.print("\n[bold cyan]⚡ Launching Diagnostic Investigation Loop...[/bold cyan]")
+    
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        transient=True
+    ) as progress:
+        task1 = progress.add_task(description="Running local port check...", total=None)
+        
+        def trace(msg):
+            progress.update(task1, description=msg)
+            
+        res = agent.run(query, trace_callback=trace)
+        
+    console.print("\n[bold green]✓ Diagnostic Audit Complete![/bold green]")
+    
+    # Render Analysis
+    console.print("\n", Panel(
+        Text(res["analysis"], style="white"),
+        title="[bold red]🚨 Root Cause Analysis[/bold red]",
+        border_style="red"
+    ))
+    
+    # Render Bash Script
+    syntax = Syntax(res["bash_fix"], "bash", theme="monokai", line_numbers=True)
+    console.print("\n", Panel(
+        syntax,
+        title="[bold green]🛠️ Recommended Bash Safe-Fix Script[/bold green]",
+        subtitle="Review before executing on production",
+        border_style="green"
+    ))
+    
+    # Render Explanation
+    console.print("\n", Panel(
+        Text(res["explanation"], style="yellow"),
+        title="[bold yellow]🛡️ Safe Execution Assurance[/bold yellow]",
+        border_style="yellow"
+    ))
