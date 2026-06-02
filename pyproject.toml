@@ -1,8 +1,9 @@
 [project]
 name = "ai-sre-agent"
 version = "1.0.0"
-description = "Autonomous AI SRE Diagnostics & Troubleshooting Agent"
+description = "Autonomous AI SRE Diagnostics & Troubleshooting Incident Response Agent"
 readme = "README.md"
+keywords = ["ai-agent", "devops", "sre", "incident-response", "linux-diagnostics", "streamlit", "rich-cli"]
 requires-python = ">=3.10"
 dependencies = [
     "streamlit>=1.35.0",
