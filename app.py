@@ -81,3 +81,23 @@ with col_query:
             res = agent.run(query, trace_callback=render_trace)
             
             st.session_state["sre_results"] = res
+
+
+with col_metric:
+    st.subheader("📊 System Vital Gauges")
+    st.markdown(
+        '''
+        <div class="metric-card">
+            <h4>Storage Cluster</h4>
+            <h2 style="color:#ff4d4d;">94% In Use</h2>
+            <p>Partition <b>/dev/sda1</b> is near capacity limits.</p>
+        </div>
+        <br>
+        <div class="metric-card">
+            <h4>Port Daemon</h4>
+            <h2 style="color:#ffcc00;">Warning Binding</h2>
+            <p>Port <b>5432</b> is not accepting connections.</p>
+        </div>
+        ''',
+        unsafe_allow_html=True
+    )
