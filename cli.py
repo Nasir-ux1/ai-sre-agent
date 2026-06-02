@@ -60,3 +60,14 @@ def run_interactive_cli(query: str):
         title="[bold yellow]🛡️ Safe Execution Assurance[/bold yellow]",
         border_style="yellow"
     ))
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="AI-SRE Troubleshooting Agent Command-Line Tool")
+    parser.add_argument("query", type=str, nargs="?", default=None, help="The system error or issue query to diagnose")
+    args = parser.parse_args()
+    
+    try:
+        run_interactive_cli(args.query)
+    except KeyboardInterrupt:
+        console.print("\n[bold red]Audit interrupted by user. Exiting.[/bold red]")
+        sys.exit(0)
