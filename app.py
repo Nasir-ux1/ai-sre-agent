@@ -42,3 +42,17 @@ st.markdown("""
 
 st.title("🛡️ AI-SRE: Autonomous Linux Troubleshooting Agent")
 st.markdown("---")
+
+# Sidebar settings panel
+with st.sidebar:
+    st.image("https://img.icons8.com/color/144/shield.png", width=80)
+    st.header("Agent Control Center")
+    api_provider, _ = Config.get_api_key()
+    st.info(f"Active Provider: **{api_provider.upper()} Mode**")
+    
+    st.subheader("System Health Metrics")
+    st.sidebar.progress(85, text="Server Uptime: 99.8%")
+    st.sidebar.progress(40, text="RAM Usage: 40%")
+
+# Layout Splitting
+col_query, col_metric = st.columns([2, 1])
