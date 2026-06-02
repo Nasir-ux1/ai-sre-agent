@@ -1,4 +1,5 @@
 import sys
+import os
 import argparse
 from rich.console import Console
 from rich.panel import Panel
@@ -7,15 +8,27 @@ from rich.syntax import Syntax
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from ai_sre.agent import SREAgent
 
-# Reconfigure standard output streams for UTF-8 compatibility on all Windows consoles
-if sys.stdout.encoding != 'utf-8':
+# Bulletproof Windows terminal encoding fix:
+# 1. Programmatically set active console code page to UTF-8 (65001) on Windows
+if sys.platform.startswith("win"):
+    try:
+        os.system('chcp 65001 >nul 2>&1')
+    except Exception:
+        pass
+
+# 2. Force stdout/stderr streams to UTF-8
+if hasattr(sys.stdout, "reconfigure"):
     try:
         sys.stdout.reconfigure(encoding='utf-8')
         sys.stderr.reconfigure(encoding='utf-8')
     except Exception:
         pass
 
-console = Console()
+# 3. Explicitly force Rich to use UTF-8 encoding
+try:
+    console = Console(encoding="utf-8")
+except Exception:
+    console = Console()
 
 def run_interactive_cli(query: str):
     console.print(Panel(Text("AI-SRE Autonomous Linux Troubleshooting Agent", style="bold green", justify="center"), subtitle="v1.0.0"))
