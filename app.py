@@ -56,3 +56,28 @@ with st.sidebar:
 
 # Layout Splitting
 col_query, col_metric = st.columns([2, 1])
+
+
+with col_query:
+    st.subheader("🤖 SRE Incident Reporter")
+    query = st.text_input("Enter your server issue, warning log, or diagnostic query:", placeholder="e.g. My database port 5432 is blocked and I have disk space failures")
+    
+    if st.button("Launch Autonomous SRE Audit", type="primary"):
+        if not query:
+            st.warning("Please describe your system issue before auditing.")
+        else:
+            agent = SREAgent(mode="mock")
+            
+            trace_placeholder = st.empty()
+            trace_logs = []
+            
+            def render_trace(msg):
+                trace_logs.append(f"[AGENT] {msg}")
+                trace_placeholder.markdown(
+                    f'<div class="terminal-output">{"<br>".join(trace_logs)}</div>',
+                    unsafe_allow_html=True
+                )
+                
+            res = agent.run(query, trace_callback=render_trace)
+            
+            st.session_state["sre_results"] = res
