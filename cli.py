@@ -7,6 +7,14 @@ from rich.syntax import Syntax
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from ai_sre.agent import SREAgent
 
+# Reconfigure standard output streams for UTF-8 compatibility on all Windows consoles
+if sys.stdout.encoding != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except Exception:
+        pass
+
 console = Console()
 
 def run_interactive_cli(query: str):
@@ -22,7 +30,7 @@ def run_interactive_cli(query: str):
 
     agent = SREAgent(mode="mock")
     
-    console.print("\n[bold cyan]⚡ Launching Diagnostic Investigation Loop...[/bold cyan]")
+    console.print("\n[bold cyan][*] Launching Diagnostic Investigation Loop...[/bold cyan]")
     
     with Progress(
         SpinnerColumn(),
@@ -36,12 +44,12 @@ def run_interactive_cli(query: str):
             
         res = agent.run(query, trace_callback=trace)
         
-    console.print("\n[bold green]✓ Diagnostic Audit Complete![/bold green]")
+    console.print("\n[bold green][OK] Diagnostic Audit Complete![/bold green]")
     
     # Render Analysis
     console.print("\n", Panel(
         Text(res["analysis"], style="white"),
-        title="[bold red]🚨 Root Cause Analysis[/bold red]",
+        title="[bold red][Analysis] Root Cause Findings[/bold red]",
         border_style="red"
     ))
     
@@ -49,7 +57,7 @@ def run_interactive_cli(query: str):
     syntax = Syntax(res["bash_fix"], "bash", theme="monokai", line_numbers=True)
     console.print("\n", Panel(
         syntax,
-        title="[bold green]🛠️ Recommended Bash Safe-Fix Script[/bold green]",
+        title="[bold green][Safe-Fix] Recommended Bash Script[/bold green]",
         subtitle="Review before executing on production",
         border_style="green"
     ))
@@ -57,7 +65,7 @@ def run_interactive_cli(query: str):
     # Render Explanation
     console.print("\n", Panel(
         Text(res["explanation"], style="yellow"),
-        title="[bold yellow]🛡️ Safe Execution Assurance[/bold yellow]",
+        title="[bold yellow][Safety] Safe Execution Assurance[/bold yellow]",
         border_style="yellow"
     ))
 
