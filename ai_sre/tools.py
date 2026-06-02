@@ -41,3 +41,40 @@ class SRETools:
             }
         except Exception as e:
             return {"status": "error", "error": str(e)}
+
+    @staticmethod
+    def check_services(service_name: str = None) -> dict:
+        """Diagnose systemd services, detecting failed loops or config issues"""
+        try:
+            if sys.platform.startswith("win"):
+                return {
+                    "status": "success",
+                    "output": f"Mock Windows Service '{service_name or 'All'}' status: Active/Running (0 errors)",
+                    "failed_units": []
+                }
+            
+            if service_name:
+                cmd = ["systemctl", "status", service_name]
+            else:
+                cmd = ["systemctl", "--failed"]
+                
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            output = res.stdout or res.stderr
+            
+            failed_units = []
+            if not service_name:
+                # Parse failed services list
+                for line in output.splitlines():
+                    if "●" in line or "failed" in line:
+                        parts = line.split()
+                        if len(parts) > 1:
+                            failed_units.append(parts[1])
+                            
+            return {
+                "status": "success",
+                "timestamp": datetime.now().isoformat(),
+                "output": output,
+                "failed_units": failed_units
+            }
+        except Exception as e:
+            return {"status": "error", "error": str(e)}
