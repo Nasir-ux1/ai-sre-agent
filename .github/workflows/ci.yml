@@ -27,4 +27,4 @@ jobs:
 
     - name: Run SRE Verification tests
       run: |
-        pytest
+        python -m pytest
