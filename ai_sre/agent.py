@@ -50,3 +50,33 @@ TOOL_SCHEMAS = [
         }
     }
 ]
+
+class SREAgent:
+    """LLM Reasoning SRE Agent that acts as a secure diagnostics troubleshooter"""
+    
+    def __init__(self, mode: str = "mock"):
+        self.mode = mode
+        self.history = []
+        
+    def execute_tool(self, name: str, params: dict = None) -> dict:
+        """Execute the structured tools based on agent decisions"""
+        params = params or {}
+        if name == "check_disk":
+            return SRETools.check_disk()
+        elif name == "check_services":
+            return SRETools.check_services(params.get("service_name"))
+        elif name == "check_network":
+            return SRETools.check_network(params.get("port"))
+        elif name == "check_processes":
+            return SRETools.check_processes(params.get("cpu_threshold", 80.0))
+        elif name == "check_logs":
+            return SRETools.check_logs(params.get("search_query", "error"), params.get("lines_count", 50))
+        return {"status": "error", "error": f"Tool '{name}' not found"}
+
+    def system_prompt(self) -> str:
+        return (
+            "You are an expert Linux SRE & DevOps Incident Response Troubleshooting Agent. "
+            "Your objective is to diagnose system issues, explain the root cause, and provide a safe bash fix script.\n"
+            "You have access to safe, structured diagnostic tools (check_disk, check_services, check_network, check_processes, check_logs).\n"
+            "Analyze issues step-by-step. Do not make up command executions. Use the tools provided."
+        )
