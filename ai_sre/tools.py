@@ -78,3 +78,34 @@ class SRETools:
             }
         except Exception as e:
             return {"status": "error", "error": str(e)}
+
+    @staticmethod
+    def check_network(port: int = None) -> dict:
+        """Inspect port mappings and active socket servers using ss / netstat"""
+        try:
+            if sys.platform.startswith("win"):
+                return {
+                    "status": "success",
+                    "output": f"Mock networking. Active ports on 127.0.0.1: [80, 443, 3000, 5432, 8501]. Requested Port {port or 'None'} check: OK",
+                    "is_blocked": False
+                }
+                
+            # Use ss or netstat
+            cmd = ["ss", "-tulpn"]
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            output = res.stdout or res.stderr
+            
+            is_blocked = False
+            if port:
+                port_pattern = f":{port} "
+                is_blocked = port_pattern in output
+                
+            return {
+                "status": "success",
+                "timestamp": datetime.now().isoformat(),
+                "output": output,
+                "port_checked": port,
+                "is_blocked": is_blocked
+            }
+        except Exception as e:
+            return {"status": "error", "error": str(e)}
