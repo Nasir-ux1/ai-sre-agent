@@ -101,3 +101,22 @@ with col_metric:
         ''',
         unsafe_allow_html=True
     )
+
+
+if "sre_results" in st.session_state:
+    res = st.session_state["sre_results"]
+    st.markdown("---")
+    
+    col_analysis, col_code = st.columns([1, 1])
+    
+    with col_analysis:
+        st.error("🚨 Root Cause Analysis Findings")
+        st.write(res["analysis"])
+        
+        st.warning("🛡️ Execution Safety Assurance")
+        st.write(res["explanation"])
+        
+    with col_code:
+        st.success("🛠️ Recommended Bash Safe-Fix Script")
+        st.code(res["bash_fix"], language="bash")
+        st.info("💡 Copy and review the script contents before executing on production servers.")
